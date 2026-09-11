@@ -1,9 +1,11 @@
 [package]
 name = "lsfb2"
 version = "0.1.0"
+description = "Cli tool for displaying fb2 metadata"
 edition = "2024"
 
 [dependencies]
-noargs = "0.4.3"
+flate2 = "1.1.10"
+lexopt = "0.3.2"
 quick-xml = "0.42.0"
 rawzip = "0.5.1"
