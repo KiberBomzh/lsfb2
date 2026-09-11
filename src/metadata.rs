@@ -17,7 +17,10 @@ impl Metadata {
         Ok(Parser::with_file(path, Self::parse)??)
     }
     pub fn from_zip<P: AsRef<Path>>(path: P) -> Result<Self, quick_xml::Error> {
-        Ok(Parser::with_zip(path, |reader: XmlReader<std::io::BufReader<ZipReader<'_>>>| Self::parse(reader))??)
+        Ok(Parser::with_zip(path, 
+            |reader: XmlReader<quick_xml::encoding::DecodingReader<std::io::BufReader<ZipReader<'_>>>>|
+            Self::parse(reader)
+        )??)
     }
 
     fn parse<R: std::io::BufRead>(mut reader: XmlReader<R>) -> Result<Self, quick_xml::Error> {

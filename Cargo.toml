@@ -7,5 +7,5 @@ edition = "2024"
 [dependencies]
 flate2 = "1.1.10"
 lexopt = "0.3.2"
-quick-xml = "0.42.0"
+quick-xml = { version = "0.42.0", features = ["encoding"] }
 rawzip = "0.5.1"

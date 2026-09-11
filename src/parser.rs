@@ -3,6 +3,7 @@ use std::io::{BufReader, Read};
 use std::fs::File;
 
 use quick_xml::reader::Reader as XmlReader;
+use quick_xml::encoding::DecodingReader;
 
 
 pub struct Parser { }
@@ -11,9 +12,11 @@ impl Parser {
     pub fn with_file<P, F, R>(path: P, func: F) -> Result<R, quick_xml::Error> 
         where
             P: AsRef<Path>,
-            F: FnOnce(XmlReader<BufReader<File>>) -> R,
+            F: FnOnce(XmlReader<DecodingReader<BufReader<File>>>) -> R,
     {
-        let reader = XmlReader::from_file(path)?;
+        let file = File::open(path)?;
+        let decoder = DecodingReader::new(BufReader::new(file));
+        let reader = XmlReader::from_reader(decoder);
 
         Ok(func(reader))
     }
@@ -21,7 +24,7 @@ impl Parser {
     pub fn with_zip<P, F, R>(path: P, func: F) -> Result<R, std::io::Error> 
         where
             P: AsRef<Path>,
-            F: FnOnce(XmlReader<BufReader<ZipReader<'_>>>) -> R,
+            F: FnOnce(XmlReader<DecodingReader<BufReader<ZipReader<'_>>>>) -> R,
     {
         use std::io::{Error, ErrorKind};
 
@@ -52,7 +55,8 @@ impl Parser {
             _ => return Err(Error::new(ErrorKind::InvalidData, format!("Unsupported compression method!"))),
         };
 
-        let reader = XmlReader::from_reader(BufReader::new(zip_reader));
+        let decoder = DecodingReader::new(BufReader::new(zip_reader));
+        let reader = XmlReader::from_reader(decoder);
 
         Ok(func(reader))
     }
