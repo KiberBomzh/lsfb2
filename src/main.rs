@@ -2,25 +2,36 @@ mod args;
 mod parser;
 mod metadata;
 
+use colored::Colorize;
+
 use metadata::Metadata;
 
 
-fn main() -> Result<(), Box<dyn std::error::Error>>{
-    let args = args::Args::parse()?;
+fn main() {
+    let args = match args::Args::parse() {
+        Ok(a) => a,
+        Err(err) => {
+            eprintln!("{}", format!("Error while parsing cli args: {err}").red().bold());
+            std::process::exit(1);
+        },
+    };
 
     #[cfg(feature = "zip")]
-    let meta = if args.zip {
-        Metadata::from_zip(&args.book)?
+    let result = if args.zip {
+        Metadata::from_zip(&args.book)
     } else {
-        Metadata::from_file(&args.book)?
+        Metadata::from_file(&args.book)
     };
 
     #[cfg(not(feature = "zip"))]
-    let meta = Metadata::from_file(&args.book)?;
+    let result = Metadata::from_file(&args.book);
 
-    meta.print();
-
-
-    Ok(())
+    match result {
+        Ok(meta) => meta.print(),
+        Err(err) => {
+            eprintln!("{}", format!("Error while parsing book: {err}").red().bold());
+            std::process::exit(1);
+        },
+    }
 }
 
