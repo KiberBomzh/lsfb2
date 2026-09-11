@@ -8,6 +8,8 @@ const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
 
 pub struct Args {
     pub book: PathBuf,
+
+    #[cfg(feature = "zip")]
     pub zip: bool,
 }
 
@@ -17,6 +19,8 @@ impl Args {
 
         
         let mut book = None;
+
+        #[cfg(feature = "zip")]
         let mut zip = false;
 
         let mut parser = lexopt::Parser::from_env();
@@ -27,6 +31,8 @@ impl Args {
                     let p = PathBuf::from(s);
                     book = Some(p);
                 },
+
+                #[cfg(feature = "zip")]
                 Short('z') | Long("zip") if !zip => 
                     zip = true,
 
@@ -46,22 +52,26 @@ impl Args {
 
         Ok( Self{
             book: book.ok_or("missing argument [BOOK]")?,
+
+            #[cfg(feature = "zip")]
             zip,
         })
     }
 }
 
 fn get_help() -> String {
-format!(r#"{DESCRIPTION}
+    let mut s = String::from(DESCRIPTION);
 
-Usage: {NAME} [OPTION]... [BOOK]
+    s.push_str(&format!("\n\nUsage: {NAME} [OPTION]... [BOOK]\n\n"));
+    s.push_str("[BOOK] - path to a fb2 book\n\n");
 
-[BOOK] - path to a fb2 book
+    s.push_str("Options:\n");
+    #[cfg(feature = "zip")]
+    s.push_str("    -z, --zip       Unzip [BOOK] before parsing\n");
 
-Options:
-    -z, --zip       Unzip [BOOK] before parsing
+    s.push_str("\n    -h, --help      Print this message and exit\n");
+    s.push_str("    -V, --version   Print version and exit\n");
 
-    -h, --help      Print this message and exit
-    -V, --version   Print version and exit
-"#)
+
+    s
 }

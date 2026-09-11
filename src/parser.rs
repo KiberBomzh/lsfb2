@@ -1,5 +1,5 @@
 use std::path::Path;
-use std::io::{BufReader, Read};
+use std::io::{BufReader};
 use std::fs::File;
 
 use quick_xml::reader::Reader as XmlReader;
@@ -21,6 +21,7 @@ impl Parser {
         Ok(func(reader))
     }
 
+    #[cfg(feature = "zip")]
     pub fn with_zip<P, F, R>(path: P, func: F) -> Result<R, std::io::Error> 
         where
             P: AsRef<Path>,
@@ -62,11 +63,14 @@ impl Parser {
     }
 }
 
+#[cfg(feature = "zip")]
 pub enum ZipReader<'a> {
     Store(rawzip::ZipVerifier<rawzip::ZipReader<&'a rawzip::FileReader>>),
     Deflate(rawzip::ZipVerifier<flate2::read::DeflateDecoder<rawzip::ZipReader<&'a rawzip::FileReader>>>),
 }
-impl Read for ZipReader<'_> {
+
+#[cfg(feature = "zip")]
+impl std::io::Read for ZipReader<'_> {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         match self {
             ZipReader::Store(r) => r.read(buf),

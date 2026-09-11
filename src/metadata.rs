@@ -2,7 +2,7 @@ use std::path::Path;
 
 use quick_xml::reader::Reader as XmlReader;
 
-use super::parser::{Parser, ZipReader};
+use super::parser::Parser;
 
 
 pub struct Metadata {
@@ -16,9 +16,11 @@ impl Metadata {
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, quick_xml::Error> {
         Ok(Parser::with_file(path, Self::parse)??)
     }
+
+    #[cfg(feature = "zip")]
     pub fn from_zip<P: AsRef<Path>>(path: P) -> Result<Self, quick_xml::Error> {
         Ok(Parser::with_zip(path, 
-            |reader: XmlReader<quick_xml::encoding::DecodingReader<std::io::BufReader<ZipReader<'_>>>>|
+            |reader: XmlReader<quick_xml::encoding::DecodingReader<std::io::BufReader<super::parser::ZipReader<'_>>>>|
             Self::parse(reader)
         )??)
     }
