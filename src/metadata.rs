@@ -159,15 +159,23 @@ impl Metadata {
     }
 
     pub fn print(&self) {
-        println!("title: {}", self.title);
-        println!("author(s): {}", self.authors.join(", "));
-        println!("language: {}", self.language);
+        use colored::Colorize;
+
+        println!("{} {}", "title:".blue(), self.title.bold());
+        println!("{} {}", "author(s):".blue(), self.authors.join(", ").bold());
+        println!("{} {}", "language:".blue(), self.language);
         if let Some(s) = &self.sequence {
-            println!("sequence: {} {}", s.name.as_ref().unwrap_or(&String::new()), s.number.as_ref().unwrap_or(&String::new()));
+            println!("{} {} {}",
+                "sequence:".cyan(),
+                s.name.as_ref().unwrap_or(&String::new()),
+                s.number.as_ref().unwrap_or(&String::new())
+            );
         }
         if let Some(a) = &self.annotation {
-            println!("annotaion:");
-            println!("{}", a.join("\n"));
+            println!("{} {}",
+                "annotaion:".cyan(),
+                a.join("\n").italic()
+            );
         }
     }
 }

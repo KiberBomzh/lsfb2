@@ -9,6 +9,7 @@ lexopt = "0.3.2"
 quick-xml = { version = "0.42.0", features = ["encoding"] }
 rawzip = { version = "0.5.1", optional = true }
 flate2 = { version = "1.1.10", optional = true }
+colored = "3.1.1"
 
 [features]
 default = []
